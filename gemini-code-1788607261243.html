@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お題ワールド 画像投稿ツール</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; background: #f4f4f9; color: #333; }
+        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        #preview { max-width: 100%; height: auto; margin-bottom: 16px; display: none; border-radius: 4px; }
+        .result-box { margin-top: 20px; background: #e9ecef; padding: 10px; border-radius: 4px; word-break: break-all; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🖼️ お題用画像アップロード</h2>
+    <p>ワールドに送信するための画像を選び、URLを発行してください。</p>
+    
+    <label>画像ファイルを選択:</label>
+    <input type="file" id="imageInput" accept="image/png, image/jpeg">
+    
+    <img id="preview" alt="プレビュー">
+    
+    <label>発行された画像URL（これをコピーしてクラスター内で使用）:</label>
+    <textarea id="urlOutput" readonly placeholder="ここにURLが表示されます"></textarea>
+    
+    <button id="copyBtn" style="display:none; background: #28a745;">URLをコピーする</button>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const urlOutput = document.getElementById('urlOutput');
+    const copyBtn = document.getElementById('copyBtn');
+
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // プレビュー表示
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+
+            // ※本格的に運用する場合はここでImgur APIやS3等の外部ストレージにPOSTしてURLを取得します。
+            // 今回は簡易的に、ブラウザ内で扱えるローカルデータURLを発行する例です。
+            const fakePublicUrl = e.target.result; 
+            
+            urlOutput.value = fakePublicUrl;
+            urlOutput.style.display = 'block';
+            copyBtn.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    });
+
+    copyBtn.addEventListener('click', function() {
+        navigator.clipboard.writeText(urlOutput.value).then(function() {
+            alert('画像URLをコピーしました！クラスター内の入力欄に貼り付けてください。');
+        }).catch(function(err) {
+            console.error('コピーに失敗しました', err);
+        });
+    });
+</script>
+
+</body>
+</html>
